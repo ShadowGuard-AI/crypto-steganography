@@ -6,6 +6,7 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 import base64
 import os
+import sys
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -20,6 +21,48 @@ def generate_key(password, salt):
     )
     key = base64.urlsafe_b64encode(kdf.derive(password.encode()))
     return key
+
+
+def _write_bits(pixels, width, pixel_index, binary):
+    """Write one bit per pixel starting at pixel_index; returns the next index.
+
+    The channel cycles red, green, blue by the bit position inside this
+    segment, and each segment (salt, length, payload) restarts the cycle
+    at red. Extraction restarts the same way, so the two sides agree
+    only because both treat segments independently; merging the
+    segments into one continuous bit stream would break old images.
+    """
+    for i, bit in enumerate(binary):
+        x = pixel_index % width
+        y = pixel_index // width
+        r, g, b = pixels[x, y]
+        if i % 3 == 0:
+            r = (r & ~1) | int(bit)
+        elif i % 3 == 1:
+            g = (g & ~1) | int(bit)
+        else:
+            b = (b & ~1) | int(bit)
+        pixels[x, y] = (r, g, b)
+        pixel_index += 1
+    return pixel_index
+
+
+def _read_bits(pixels, width, pixel_index, count):
+    """Read count bits written by _write_bits; returns (bits, next index)."""
+    bits = ""
+    for i in range(count):
+        x = pixel_index % width
+        y = pixel_index // width
+        r, g, b = pixels[x, y]
+        if i % 3 == 0:
+            bits += str(r & 1)
+        elif i % 3 == 1:
+            bits += str(g & 1)
+        else:
+            bits += str(b & 1)
+        pixel_index += 1
+    return bits, pixel_index
+
 
 def encrypt_message(message, key):
     """Encrypts a message using Fernet symmetric encryption."""
@@ -64,57 +107,14 @@ def hide_message(image_path, message, password):
 
         pixels = img.load()
         pixel_index = 0
-        bit_index = 0
 
-        # Encode the salt at the beginning of the image
+        # Three segments in a fixed order: salt, length, payload. The
+        # reader below depends on both the order and the sizes.
         salt_binary = ''.join(format(byte, '08b') for byte in salt)
-        salt_len = len(salt_binary)
-        for i in range(salt_len):
-            x = pixel_index % width
-            y = pixel_index // width
-            r, g, b = pixels[x, y]
-
-            if i % 3 == 0:
-                r = (r & ~1) | int(salt_binary[i])
-            elif i % 3 == 1:
-                g = (g & ~1) | int(salt_binary[i])
-            else:
-                b = (b & ~1) | int(salt_binary[i])
-            pixels[x, y] = (r, g, b)
-            pixel_index += 1
-            
-
-        # Encode the message length after the salt
+        pixel_index = _write_bits(pixels, width, pixel_index, salt_binary)
         len_binary = bin(message_len)[2:].zfill(32)
-        for i in range(len(len_binary)):
-            x = pixel_index % width
-            y = pixel_index // width
-            r, g, b = pixels[x, y]
-
-            if i % 3 == 0:
-                r = (r & ~1) | int(len_binary[i])
-            elif i % 3 == 1:
-                g = (g & ~1) | int(len_binary[i])
-            else:
-                b = (b & ~1) | int(len_binary[i])
-
-            pixels[x, y] = (r, g, b)
-            pixel_index += 1
-
-        # Encode the encrypted message
-        for i in range(message_len):
-            x = pixel_index % width
-            y = pixel_index // width
-            r, g, b = pixels[x, y]
-
-            if i % 3 == 0:
-                r = (r & ~1) | int(binary_message[i])
-            elif i % 3 == 1:
-                g = (g & ~1) | int(binary_message[i])
-            else:
-                b = (b & ~1) | int(binary_message[i])
-            pixels[x, y] = (r, g, b)
-            pixel_index += 1
+        pixel_index = _write_bits(pixels, width, pixel_index, len_binary)
+        _write_bits(pixels, width, pixel_index, binary_message)
 
         # Save the modified image. Always save as PNG: lossy formats such
         # as JPEG recompress the pixels and destroy the hidden LSB data.
@@ -142,63 +142,16 @@ def extract_message(image_path, password):
         width, height = img.size
 
         pixel_index = 0
-        extracted_salt_binary = ""
-
-        # Extract the salt
-        for i in range(128):  # Salt is 16 bytes = 128 bits
-            x = pixel_index % width
-            y = pixel_index // width
-            r, g, b = pixels[x, y]
-
-            if i % 3 == 0:
-                extracted_salt_binary += str(r & 1)
-            elif i % 3 == 1:
-                extracted_salt_binary += str(g & 1)
-            else:
-                extracted_salt_binary += str(b & 1)
-
-            pixel_index += 1
-
+        extracted_salt_binary, pixel_index = _read_bits(pixels, width, pixel_index, 128)
         salt = bytes([int(extracted_salt_binary[i:i+8], 2) for i in range(0, len(extracted_salt_binary), 8)])
 
-
-        # Extract the message length
-        extracted_len_binary = ""
-        for i in range(32):
-            x = pixel_index % width
-            y = pixel_index // width
-            r, g, b = pixels[x, y]
-
-            if i % 3 == 0:
-                extracted_len_binary += str(r & 1)
-            elif i % 3 == 1:
-                extracted_len_binary += str(g & 1)
-            else:
-                extracted_len_binary += str(b & 1)
-
-            pixel_index += 1
-
+        extracted_len_binary, pixel_index = _read_bits(pixels, width, pixel_index, 32)
         message_len = int(extracted_len_binary, 2)
         if message_len == 0 or message_len > width * height - pixel_index:
             logging.error("No valid hidden message found, or the image data is corrupted.")
             return None
 
-        # Extract the encrypted message
-        extracted_binary_message = ""
-        for i in range(message_len):
-            x = pixel_index % width
-            y = pixel_index // width
-            r, g, b = pixels[x, y]
-
-            if i % 3 == 0:
-                extracted_binary_message += str(r & 1)
-            elif i % 3 == 1:
-                extracted_binary_message += str(g & 1)
-            else:
-                extracted_binary_message += str(b & 1)
-
-            pixel_index += 1
-
+        extracted_binary_message, pixel_index = _read_bits(pixels, width, pixel_index, message_len)
 
         encrypted_message = bytes([int(extracted_binary_message[i:i+8], 2) for i in range(0, len(extracted_binary_message), 8)])
 
@@ -254,9 +207,12 @@ def main():
 
         if not os.path.isfile(image_path):
             logging.error("Image file not found.")
-            return
+            sys.exit(1)
 
-        hide_message(image_path, message, password)
+        # hide_message reports failure by returning None; that used to
+        # fall through to a normal exit, so a failed hide looked done.
+        if hide_message(image_path, message, password) is None:
+            sys.exit(1)
 
 
     elif args.mode == 'extract':
@@ -265,24 +221,20 @@ def main():
 
         if not os.path.isfile(image_path):
             logging.error("Image file not found.")
-            return
+            sys.exit(1)
 
         extracted_message = extract_message(image_path, password)
         if extracted_message:
             print("Extracted message:", extracted_message)
+        else:
+            sys.exit(1)
 
     else:
         parser.print_help()
+        sys.exit(1)
 
 
 if __name__ == "__main__":
     main()
 
 
-# Usage Examples:
-#
-# To hide a message:
-# python crypto_steganography.py hide image.png "This is a secret message!" mysecretpassword
-#
-# To extract a message:
-# python crypto_steganography.py extract hidden_image.png mysecretpassword
