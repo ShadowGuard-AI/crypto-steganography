@@ -55,9 +55,11 @@ def hide_message(image_path, message, password):
         binary_message = ''.join(format(byte, '08b') for byte in encrypted_message)
         message_len = len(binary_message)
 
-        # Check if the image is large enough to hide the message
+        # Check if the image is large enough to hide the message.
+        # Encoding stores one bit per pixel, plus a 128 bit salt and a
+        # 32 bit length header, so capacity is width * height bits total.
         width, height = img.size
-        if message_len > width * height * 3:
+        if 128 + 32 + message_len > width * height:
             raise ValueError("Image is not large enough to hide the message.")
 
         pixels = img.load()
@@ -114,9 +116,10 @@ def hide_message(image_path, message, password):
             pixels[x, y] = (r, g, b)
             pixel_index += 1
 
-        # Save the modified image
-        new_image_path = "hidden_" + os.path.basename(image_path)
-        img.save(new_image_path)
+        # Save the modified image. Always save as PNG: lossy formats such
+        # as JPEG recompress the pixels and destroy the hidden LSB data.
+        new_image_path = "hidden_" + os.path.splitext(os.path.basename(image_path))[0] + ".png"
+        img.save(new_image_path, format="PNG")
         logging.info(f"Message hidden successfully. Image saved as {new_image_path}")
         return new_image_path
 
@@ -176,6 +179,9 @@ def extract_message(image_path, password):
             pixel_index += 1
 
         message_len = int(extracted_len_binary, 2)
+        if message_len == 0 or message_len > width * height - pixel_index:
+            logging.error("No valid hidden message found, or the image data is corrupted.")
+            return None
 
         # Extract the encrypted message
         extracted_binary_message = ""
