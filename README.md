@@ -70,3 +70,9 @@ python3 main.py extract --help
 ## License
 
 Copyright (c) ShadowStrikeHQ
+
+## Diagrams and maps
+
+I drew the system out in [crypto-steganography-Visuals](crypto-steganography-Visuals/): an architecture diagram, a data-flow diagram of the three segment layout, a flowchart of a run, and a product map, with the written product map, statistics with citations, and the roadmap in [VISUAL.md](crypto-steganography-Visuals/VISUAL.md). Every sheet also ships as a PNG photograph of the paper page beside its SVG.
+
+![crypto-steganography architecture](crypto-steganography-Visuals/architecture.svg)
