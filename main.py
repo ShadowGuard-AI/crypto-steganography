@@ -118,6 +118,9 @@ def hide_message(image_path, message, password):
 
         # Save the modified image. Always save as PNG: lossy formats such
         # as JPEG recompress the pixels and destroy the hidden LSB data.
+        # The output name is fixed by the input basename and lands in
+        # the current directory, not beside the input image, and an
+        # existing file of that name is overwritten without a prompt.
         new_image_path = "hidden_" + os.path.splitext(os.path.basename(image_path))[0] + ".png"
         img.save(new_image_path, format="PNG")
         logging.info(f"Message hidden successfully. Image saved as {new_image_path}")
@@ -162,6 +165,11 @@ def extract_message(image_path, password):
         # Decrypt the message
         decrypted_message = decrypt_message(encrypted_message, key)
 
+        # Truthiness is the success test here, so a message that was
+        # hidden as an empty string decrypts correctly and is still
+        # reported as a failure: its decrypted form is "". Hiding an
+        # empty message is accepted by hide, so the two ends disagree
+        # about whether that is a valid payload.
         if decrypted_message:
             logging.info("Message extracted successfully.")
             return decrypted_message
