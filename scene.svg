@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 300" role="img" aria-label="The walled garden in three bands: dusk light fading over the wall in the far band, the door swinging a gap width and back while fern fronds sway and the key hangs still in the middle band, and a cold frame lid lifting a fraction while leaf litter shifts and seed pods lie still in the near band">
+<rect width="900" height="300" fill="#3a3236"/>
+<rect x="0" y="0" width="900" height="26" fill="#e2d6ba"><animate attributeName="fill" values="#e2d6ba;#d8a43e;#d8a43e" dur="16s" repeatCount="indefinite"/></rect>
+<rect x="0" y="26" width="900" height="120" fill="#703e2c"/>
+<g stroke="#4a2a20" stroke-width="2"><line x1="0" y1="56" x2="900" y2="56"/><line x1="0" y1="86" x2="900" y2="86"/><line x1="0" y1="116" x2="900" y2="116"/></g>
+<g>
+<animateTransform attributeName="transform" type="rotate" values="0 742 60; -2.4 742 60; 0 742 60; 0 742 60" dur="12s" repeatCount="indefinite"/>
+<rect x="742" y="60" width="96" height="150" fill="#604228"/>
+<line x1="774" y1="66" x2="774" y2="204" stroke="#483018" stroke-width="3"/><line x1="806" y1="66" x2="806" y2="204" stroke="#483018" stroke-width="3"/>
+</g>
+<rect x="838" y="66" width="9" height="140" fill="#d8a43e"/>
+<g stroke="#9e4a2c" stroke-width="4" fill="none"><circle cx="722" cy="96" r="9"/><line x1="722" y1="105" x2="722" y2="138"/><line x1="722" y1="124" x2="734" y2="124"/></g>
+<g stroke="#3e6036" stroke-width="3" fill="none">
+<path d="M120 210 Q112 176 100 158"><animate attributeName="d" values="M120 210 Q112 176 100 158;M120 210 Q118 176 110 156;M120 210 Q112 176 100 158" dur="7s" repeatCount="indefinite"/></path>
+<path d="M140 210 Q140 174 134 154"><animate attributeName="d" values="M140 210 Q140 174 134 154;M140 210 Q146 174 142 152;M140 210 Q140 174 134 154" dur="8s" repeatCount="indefinite"/></path>
+<path d="M160 210 Q168 176 180 158"><animate attributeName="d" values="M160 210 Q168 176 180 158;M160 210 Q162 176 168 156;M160 210 Q168 176 180 158" dur="7.5s" repeatCount="indefinite"/></path>
+</g>
+<polygon points="0,236 420,214 900,226 900,262 300,256 0,268" fill="#584632"/>
+<g>
+<animateTransform attributeName="transform" type="rotate" values="0 230 252; -1.6 230 252; 0 230 252" dur="10s" repeatCount="indefinite"/>
+<polygon points="150,252 310,252 292,226 168,226" fill="#c4b282"/>
+</g>
+<polygon points="150,256 310,256 292,230 168,230" fill="#463628" opacity="0.55"/>
+<g fill="#9e4a2c">
+<ellipse cx="420" cy="252" rx="9" ry="3.4"><animate attributeName="cx" values="420;428;420" dur="9s" repeatCount="indefinite"/></ellipse>
+<ellipse cx="520" cy="262" rx="9" ry="3.4"><animate attributeName="cx" values="520;529;520" dur="11s" repeatCount="indefinite"/></ellipse>
+<ellipse cx="640" cy="250" rx="9" ry="3.4" fill="#d8a43e"><animate attributeName="cx" values="640;647;640" dur="10s" repeatCount="indefinite"/></ellipse>
+</g>
+<g fill="#7a6442" stroke="#54442c" stroke-width="1.6"><ellipse cx="90" cy="278" rx="14" ry="7"/><ellipse cx="700" cy="282" rx="14" ry="7"/></g>
+</svg>
