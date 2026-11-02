@@ -61,7 +61,7 @@ Extract a message:
 python3 main.py extract hidden_test.png REDACTED
 ```
 
-Redaction note: the live README printed one concrete password value in the hide example and again in the extract example. Both occurrences are redacted in this re-skin and on the site. Put your own password in that position when you run the tool.
+Redaction note: the live README printed one concrete password value in the hide example and again in the extract example. Both occurrences are redacted in this re-skin and on the site. The value itself is not printed here. Put your own password in that position when you run the tool.
 
 On success this prints, for the example above:
 
@@ -114,7 +114,6 @@ Copyright (c) ShadowStrikeHQ
 I drew the system out in [crypto-steganography-Visuals](crypto-steganography-Visuals/): an architecture diagram, a data-flow diagram of the three segment layout, a flowchart of a run, and a product map, with the written product map, statistics with citations, and the roadmap in [VISUAL.md](crypto-steganography-Visuals/VISUAL.md). Every sheet also ships as a PNG photograph of the paper page beside its SVG.
 
 ![crypto-steganography architecture](crypto-steganography-Visuals/architecture.svg)
-
 
 ![Major separator](sep-heavy.svg)
 
