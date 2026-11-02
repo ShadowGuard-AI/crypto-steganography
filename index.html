@@ -1,164 +1,102 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Crypto Steganography: what it is, how it runs, where it stops</title>
-<meta name="description" content="Crypto Steganography is one of my projects. The README in the repo is short, so this page sticks to what the files themselves show.">
-<style>
-:root {
-  --bg: #181c3a; --panel: #22284e; --ink: #eeeef6;
-  --mut: #2d3669;
-  --acc: #7eb8f7; --acc2: #f7ba7e;
-  --line: #22284e;
-}
-* { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--ink);
-  font-family: 'Trebuchet MS', sans-serif; line-height: 1.55; }
-code, pre, .mono { font-family: 'Courier New', monospace; }
-a { color: var(--acc2); }
-.hero { padding: 3rem 6vw 1rem; }
-.hero img.banner { width: 100%; height: auto; border: 1px solid var(--line);
-  border-radius: 10px; }
-.logo { width: 92px; height: 92px; border-radius: 18px;
-  border: 1px solid var(--line); }
-h1 { font-size: 2.4rem; margin: 0.4em 0 0.1em; }
-h2 { border-bottom: 2px solid var(--acc); padding-bottom: 0.2em;
-  margin-top: 2em; }
-.lede { font-size: 1.15rem; max-width: 62ch; }
-main { padding: 0 6vw 3rem; max-width: 1180px; margin: 0 auto; }
-.grid { display: grid; gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
-.card { background: var(--panel); border: 1px solid var(--line);
-  border-radius: 12px; padding: 1rem 1.2rem; }
-.card.pop { animation: rise 0.7s ease both; }
-@keyframes rise { from { opacity: 0; transform: translateY(14px); }
-  to { opacity: 1; transform: none; } }
-pre.code { background: #101014; color: #e8e6df; padding: 1rem 1.2rem;
-  border-radius: 12px; overflow-x: auto; font-size: 0.86rem;
-  border-left: 5px solid var(--acc); }
-table { border-collapse: collapse; width: 100%; }
-td, th { border-bottom: 1px solid var(--line); padding: 0.45rem 0.6rem;
-  text-align: left; }
-.shots { display: grid; gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
-.shots img { width: 100%; height: auto; border: 1px solid var(--line);
-  border-radius: 10px; background: #f4f1e8; }
-footer { padding: 2rem 6vw; border-top: 1px solid var(--line);
-  color: var(--mut); }
-.rail { display: flex; gap: 1.2rem; align-items: flex-start; }
-.rail nav { position: sticky; top: 1rem; min-width: 180px; }
-@media (max-width: 760px) { .rail { flex-direction: column; }
-  .rail nav { position: static; } }
-@media (prefers-reduced-motion: reduce) {
-  .card.pop { animation: none; } * { scroll-behavior: auto; } }
-</style>
-</head>
-<body class="layout-poster">
-<!-- This page exists for crypto-steganography alone: the layout (poster),
-     the colors, and the type were picked for this project, not
-     shared with the other project pages. The code block below is
-     copied from the file it names, line for line. If it looks
-     plain, that is because the project is plain, and I would
-     rather the page match the project than dress it up. The one
-     thing I will not do here is oversell: what this project does
-     not do is stated on the page, not hidden from it. -->
-<header class="hero">
-  <img class="logo" src="assets/logo.png" alt="Crypto Steganography logo">
-  <img class="banner" src="assets/banner.png" alt="">
-  <h1>Crypto Steganography</h1>
-  <p class="mono"><a href="https://github.com/ShadowGuard-AI/crypto-steganography">github.com/ShadowGuard-AI/crypto-steganography</a></p>
-</header>
+<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><title>crypto-steganography: The Walled Garden Door Left Ajar</title>
+<style>@font-face{font-family:Disp;src:url("fonts/CreteRound.ttf")}@font-face{font-family:Text;src:url("fonts/Bitter.ttf")}
+body{background:#f6eed8;font-family:Text,serif;color:#211d18;margin:0}main{max-width:920px;margin:0 auto;padding:28px}
+h1,h2,h3{font-family:Disp,serif;color:#9e4a2c}section{background:#efe4c8;padding:18px 22px;margin:16px 0;border-left:5px solid #9e4a2c}
+img{max-width:100%}button{background:#9e4a2c;color:#f6eed8;border:2px solid #584632;border-radius:4px;padding:12px 20px;margin:4px;font-family:Disp,serif}
+pre{white-space:pre-wrap;font-family:Text,serif}</style></head><body><main>
+<img src="intro-banner.png" alt="Introduction banner: the themed scene before any name is given">
+<h1>crypto-steganography: The Walled Garden Door Left Ajar</h1>
+<img src="logo.png" alt="Logo"><img src="banner.png" alt="Wordmark banner">
+<img src="scene.svg" alt="Animated scene in three bands">
+<div><button type="button">Hide the Message</button><button type="button">Extract the Message</button><button type="button">Show the Round Notes</button></div>
+<h3>Encrypted Before It Is Hidden</h3><h3>Three Segments in a Fixed Order</h3><h3>One Bit per Pixel</h3><h3>PNG Out or Nothing</h3><h3>Too Small Means No File</h3>
+<section><h2>First plate: the job</h2><p>This command line tool hides text inside an image file. It can also pull that text back out. The hiding uses least significant bit steganography. The text is encrypted before it goes into the pixels, never after, never instead.</p></section>
+<section><h2>Second plate: the method in order</h2><p>A fresh random salt of 16 bytes is made for each hide run. A 256 bit key is derived from the password and that salt with PBKDF2-HMAC-SHA256 at 390000 iterations. The derived key is base64 url safe encoded and handed to Fernet from the cryptography package, which encrypts the message. Three segments then go into the image, one bit per pixel, in a fixed order: the salt at 128 bits, then the length of the encrypted payload in bits held in a 32 bit field, then the encrypted payload itself. Inside each segment the colour channel cycles red, green, blue by bit position, and each new segment restarts that cycle at red. Extraction reverses the walk. It reads salt and length back, derives the same key from the password the caller gives, and decrypts.</p></section>
+<section><h2>Third plate: ground rules</h2><p>Python 3 is required. So are Pillow at 10.0.0 or later and cryptography at 41.0.0 or later. The requirements file names both. Both packages are imported at the top of main.py. On a machine without them, even a plea for help stops at the import line. No help text prints.</p></section>
+<section><h2>Fourth plate: install</h2><p>The install lines stand exactly as the README prints them in the preserved record below. Clone line first. Directory change next. Requirements install last. The clone line names ShadowGuard-AI, hyphenated, and it is correct. No flag is raised against it.</p></section>
+<section><h2>Fifth plate: the two working forms</h2><p>Hide form: python3 main.py hide, then an image path, then the message, then the password. Extract form: python3 main.py extract, then an image path, then the password. Placeholders only. No real message is printed. No real password is printed. No path from any real machine is printed. Redaction note: the live README printed one concrete password value in its hide and extract examples. Both occurrences are redacted here and in the re-skinned README. Put your own password in that position.</p></section>
+<section><h2>Sixth plate: controls in parser order</h2><p>The mode comes first. It is a subcommand choice, hide or extract. Under hide, three positionals follow in order: image, message, password. Under extract, two positionals follow: image, password. The help flag closes each form. A run with no mode prints the help text and exits 1.</p></section>
+<section><h2>Seventh plate: the hide station</h2><p>The input image is converted to RGB, which drops an alpha channel from a source image without comment. The output is always a PNG file. Its name is the word hidden, an underscore, and the input base name, with a png ending. It lands in the current working directory, not beside the source image. A file of that name already sitting there is overwritten with no prompt. A good run logs that the message was hidden and names the saved file. It then exits 0. The password and the message are encoded as utf-8 before use.</p></section>
+<section><h2>Eighth plate: the extract station</h2><p>A good run prints the recovered text to stdout after the words Extracted message, and exits 0. A wrong password gives a decryption failure in the log and no recovered text, and the run exits 1. An image holding no valid hidden payload gives an error in the log and no recovered text, and that run also exits 1. An empty message hides fine, then fails at extraction: extract decrypts it correctly, tests the result, finds an empty string, and reports a decryption failure, exiting 1.</p></section>
+<section><h2>Ninth plate: the capacity sum</h2><p>One bit rides on each pixel. The header takes 160 bits before any payload bit is placed. So the ceiling is the pixel count minus 160, counted in bits of encrypted data. The README works one case. A 200 by 200 pixel image holds at most 39840 bits, about 4980 bytes, and the Fernet token runs larger than the plain message it carries. Too small an image logs that the image is not large enough, writes no output file, and the run exits 1. Format warning at full size: lossy formats such as JPEG recompress pixels and destroy the hidden bits. Extract from the PNG output, never from a JPEG copy of it.</p></section>
+<section><h2>Last plate: licence and testing</h2><p>There are no bundled tests. The hide and extract round trip was verified by hand. The README licence section carries a copyright line only, naming ShadowStrikeHQ. That line is recorded here as a fault in place: it does not match the organisation in the install line, and it names no licence. Beside it sits a separate fact. The repository LICENSE file carries the MIT License. Its holder line gives a pen name together with a single initial for the remaining name. That fact is recorded. The initial is not expanded.</p></section>
+<section><h2>The preserved README record, with the password value redacted</h2><pre># crypto-steganography
 
-<main>
-  <section class="rail">
-    <nav aria-label="on this page">
-      <p class="mono"><a href="#run">Run it</a><br>
-      <a href="#files">The files</a><br>
-      <a href="#sheets">The sheets</a><br>
-      <a href="https://github.com/ShadowGuard-AI/crypto-steganography">The repo</a></p>
-    </nav>
-    <div>
-      <p class="lede">Crypto Steganography is one of my projects. The README in the repo is short, so this page sticks to what the files themselves show.</p>
-      <div class="grid">
-        <div class="card pop"><h3>What it is</h3>
-          <p>Crypto Steganography: 3 files, 300 counted
-          lines across Python 282, Markdown 14, Text 4. One job, done in the
-          open, in files you can read.</p></div>
-        <div class="card pop"><h3>The biggest piece</h3>
-          <p><code>main.py</code> carries the most
-          lines. If the project grows, that file is where the growth
-          lands first, for better or worse.</p></div>
-        <div class="card pop"><h3>The honest gap</h3>
-          <p>No test files yet. That is the honest gap, and the roadmap in the visuals folder says what the first one should cover.</p></div>
-      </div>
-      <section id="run">
-        <h2>Run it</h2>
-        <p>The repo README has the exact commands for this one. The
-        shape is the shape for most of my projects: clone it, read the
-        top file first so you know what will happen, then run it on
-        something you do not mind breaking.</p>
-        <p class="mono">$ git clone https://github.com/ShadowGuard-AI/crypto-steganography.git<br>$ cd crypto-steganography</p>
-      </section>
-      
-  <section aria-label="real code">
-    <h2>The code, as it sits in the repo</h2>
-    <p>From <code>main.py</code>, line 237 on. I did
-    not tidy it for the page. What you see is what the file has.</p>
-    <pre class="code"><code>
+A command line tool that hides text inside an image file and extracts it again, using least significant bit (LSB) steganography. The text is encrypted before it is hidden.
 
-def main():
-    &quot;&quot;&quot;Main function to parse arguments and execute the chosen operation.&quot;&quot;&quot;
-    parser = setup_argparse()
-    args = parser.parse_args()
+## How it works
 
-    if args.mode == &#x27;hide&#x27;:
-        image_path = args.image
-        message = args.message
-        password = args.password
+- A random 16 byte salt is generated for each hide operation.
+- A 256 bit key is derived from the password and the salt with PBKDF2-HMAC-SHA256 (390000 iterations).
+- The message is encrypted with Fernet (from the `cryptography` package).
+- The salt (128 bits), the encrypted message length (32 bits), and the encrypted message are written one bit per pixel into the least significant bits of the image, in that order.
+- Extraction reads the salt and length back, derives the same key from the supplied password, and decrypts the message.
 
-        if not os.path.isfile(image_path):
-            logging.error(&quot;Image file not found.&quot;)
-            return
+## Requirements
 
-        hide_message(image_path, message, password)
+- Python 3
+- Pillow and cryptography, listed in `requirements.txt`
 
+## Install
 
-    elif args.mode == &#x27;extract&#x27;:
-        image_path = args.image
-        password = args.password</code></pre>
-  </section>
-      <section id="files">
-        <h2>The files that matter</h2>
-        <table><tr><th>File</th><th>Lines</th></tr>
-        <tr><td><code>main.py</code></td><td>282</td></tr>
-        <tr><td><code>README.md</code></td><td>14</td></tr>
-        <tr><td><code>requirements.txt</code></td><td>4</td></tr>
-        </table>
-        <p>Names doing the work: <span class="mono">generate_key, encrypt_message, decrypt_message, hide_message, extract_message, setup_argparse, main</span>.</p>
-      </section>
-      <section id="sheets">
-        <h2>Drawn by hand</h2>
-        <p>I sketch my projects on notebook paper so I have to
-        understand them well enough to draw them. The full set,
-        with the counts and how they were counted, is the
-        <a href="https://github.com/ShadowGuard-AI/crypto-steganography/tree/main/crypto-steganography-Visuals">crypto-steganography-Visuals</a>
-        folder in the repo. Nothing is drawn over the binder holes.
-        That is a rule, not a style.</p>
-        <div class="shots">
-          <img src="assets/architecture.png" alt="Hand drawn architecture sheet for Crypto Steganography">
-          <img src="assets/flowchart.png" alt="Hand drawn flowchart sheet for Crypto Steganography">
-          <img src="assets/product-map.png" alt="Hand drawn product map sheet for Crypto Steganography">
-        </div>
-      </section>
-    </div>
-  </section>
-</main>
-<footer>
-  <p>Crypto Steganography is one of my projects. This page was written
-  from the repo itself on 2026-10-30: the counts are the
-  repo's counts, the code is the repo's code, and the gaps are the
-  repo's gaps.</p>
-</footer>
-</body>
-</html>
+```bash
+git clone https://github.com/ShadowGuard-AI/crypto-steganography.git
+cd crypto-steganography
+pip install -r requirements.txt
+```
+
+## Usage
+
+Hide a message:
+
+```bash
+python3 main.py hide test.png &quot;hello secret world&quot; REDACTED
+```
+
+This writes `hidden_test.png` in the current directory and logs `Message hidden successfully. Image saved as hidden_test.png`.
+
+Extract a message:
+
+```bash
+python3 main.py extract hidden_test.png REDACTED
+```
+
+On success this prints, for the example above:
+
+```text
+Extracted message: hello secret world
+```
+
+Show help:
+
+```bash
+python3 main.py --help
+python3 main.py hide --help
+python3 main.py extract --help
+```
+
+## Parameters
+
+- `hide &lt;image&gt; &lt;message&gt; &lt;password&gt;`: hide `message` in `image`, protected by `password`.
+- `extract &lt;image&gt; &lt;password&gt;`: extract the hidden message from `image` using `password`.
+- `-h`, `--help`: show help and exit.
+
+## Limitations
+
+- Output is always saved as a PNG file named `hidden_&lt;original base name&gt;.png` in the current directory, whatever the input format was. PNG is required because lossy formats such as JPEG recompress pixels and destroy the hidden data. Extract from the PNG output, not from a JPEG copy of it.
+- Capacity is one bit per pixel, minus a 160 bit header (salt plus length). A 200 by 200 pixel image therefore holds at most 39840 bits, about 4980 bytes, of encrypted data, and the Fernet token is larger than the plain message. Hiding into an image that is too small logs `Error: Image is not large enough to hide the message.` and writes no output file.
+- A wrong password logs a decryption failure and prints no extracted message.
+- Extracting from an image that contains no valid hidden message logs an error and prints no extracted message.
+- There are no bundled tests. The hide and extract round trip above was verified by hand.
+
+## License
+
+Copyright (c) ShadowStrikeHQ
+
+## Diagrams and maps
+
+I drew the system out in [crypto-steganography-Visuals](crypto-steganography-Visuals/): an architecture diagram, a data-flow diagram of the three segment layout, a flowchart of a run, and a product map, with the written product map, statistics with citations, and the roadmap in [VISUAL.md](crypto-steganography-Visuals/VISUAL.md). Every sheet also ships as a PNG photograph of the paper page beside its SVG.
+
+![crypto-steganography architecture](crypto-steganography-Visuals/architecture.svg)
+</pre></section>
+</main></body></html>
